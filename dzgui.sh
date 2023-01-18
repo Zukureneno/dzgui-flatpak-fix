@@ -69,7 +69,7 @@ print_news(){
 }
 
 declare -A deps
-deps=([awk]="5.1.1" [curl]="7.80.0" [jq]="1.6" [tr]="9.0" [$steamsafe_zenity]="3.42.1" [steam] or [flatpak run com.valvesoftware.Steam --version]="1.0.0")
+deps=([awk]="5.1.1" [curl]="7.80.0" [jq]="1.6" [tr]="9.0" [$steamsafe_zenity]="3.42.1" [steam or flatpak run com.valvesoftware.Steam --version]="1.0.0")
 changelog(){
 	if [[ $branch == "stable" ]]; then
 		md="https://raw.githubusercontent.com/aclist/dztui/dzgui/changelog.md"
@@ -829,9 +829,8 @@ concat_mods(){
 launch(){
 	mods=$(concat_mods)
 	if [[ $debug -eq 1 ]]; then
-		launch_options="steam -applaunch $aid -connect=$ip -nolauncher -nosplash -name=$name -skipintro \"-mod=$mods\""
-		or
-			flatpak run com.valvesoftware.Steam -applaunch 221100 $aid -connect=$ip -nolauncher -nosplash -skipintro -name=$name \"-mod=$mods\"
+		#launch_options="steam -applaunch $aid -connect=$ip -nolauncher -nosplash -name=$name -skipintro \"-mod=$mods\""
+		launch_options="flatpak run com.valvesoftware.Steam -applaunch $aid -connect=$ip -nolauncher -nosplash -skipintro -name=$name \"-mod=$mods\""
 		print_launch_options="$(printf "This is a dry run.\nThese options would have been used to launch the game:\n\n$launch_options\n" | fold -w 60)"
 		$steamsafe_zenity --question --title="DZGUI" --ok-label="Write to file" --cancel-label="Back"\
 			--text="$print_launch_options" 2>/dev/null
@@ -846,9 +845,8 @@ launch(){
 	else
 		echo "[DZGUI] All OK. Launching DayZ"
 		$steamsafe_zenity --width 500 --title="DZGUI" --info --text="Launch conditions satisfied.\nDayZ will now launch after clicking [OK]." 2>/dev/null
-		steam -applaunch $aid -connect=$ip -nolauncher -nosplash -skipintro -name=$name \"-mod=$mods\"
-		or
-			flatpak run com.valvesoftware.Steam -applaunch 221100 $aid -connect=$ip -nolauncher -nosplash -skipintro -name=$name \"-mod=$mods\"
+		#steam -applaunch $aid -connect=$ip -nolauncher -nosplash -skipintro -name=$name \"-mod=$mods\"
+		flatpak run com.valvesoftware.Steam -applaunch $aid -connect=$ip -nolauncher -nosplash -skipintro -name=$name \"-mod=$mods\"
 		exit
 	fi
 		one_shot_launch=0
