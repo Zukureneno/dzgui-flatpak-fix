@@ -69,7 +69,7 @@ print_news(){
 }
 
 declare -A deps
-deps=([awk]="5.1.1" [curl]="7.80.0" [jq]="1.6" [tr]="9.0" [$steamsafe_zenity]="3.42.1" [steam]="1.0.0")
+deps=([awk]="5.1.1" [curl]="7.80.0" [jq]="1.6" [tr]="9.0" [$steamsafe_zenity]="3.42.1" [steam] or [flatpak run com.valvesoftware.Steam --version]="1.0.0")
 changelog(){
 	if [[ $branch == "stable" ]]; then
 		md="https://raw.githubusercontent.com/aclist/dztui/dzgui/changelog.md"
@@ -380,7 +380,7 @@ manual_mod_install(){
 			[[ -f $ex ]] && return 1
 			local downloads_dir="$steam_path/steamapps/workshop/downloads/$aid"
 			local workshop_dir="$steam_path/steamapps/workshop/content/$aid"
-			steam "steam://url/CommunityFilePage/${stage_mods[$i]}"
+			xdg-open "steam://url/CommunityFilePage/${stage_mods[$i]}"
 			echo "# Opening workshop page for ${stage_mods[$i]}. If you see no progress after subscribing, try unsubscribing and resubscribing again until the download commences."
 			sleep 1s
 			foreground
@@ -467,7 +467,7 @@ auto_mod_install(){
 		[[ -f "/tmp/dz.status" ]] && rm "/tmp/dz.status"
 		touch "/tmp/dz.status"
 		console_dl "$diff" &&
-		steam steam://open/downloads && 2>/dev/null 1>&2
+		xdg-open steam://open/downloads && 2>/dev/null 1>&2
 		win=$(xdotool search --name "DZG Watcher")
 		xdotool windowactivate $win
 		until [[ -z $(comm -23 <(printf "%s\n" "${modids[@]}" | sort) <(ls -1 $workshop_dir | sort)) ]]; do
@@ -830,6 +830,8 @@ launch(){
 	mods=$(concat_mods)
 	if [[ $debug -eq 1 ]]; then
 		launch_options="steam -applaunch $aid -connect=$ip -nolauncher -nosplash -name=$name -skipintro \"-mod=$mods\""
+		or
+			flatpak run com.valvesoftware.Steam -applaunch 221100 $aid -connect=$ip -nolauncher -nosplash -skipintro -name=$name \"-mod=$mods\"
 		print_launch_options="$(printf "This is a dry run.\nThese options would have been used to launch the game:\n\n$launch_options\n" | fold -w 60)"
 		$steamsafe_zenity --question --title="DZGUI" --ok-label="Write to file" --cancel-label="Back"\
 			--text="$print_launch_options" 2>/dev/null
@@ -845,6 +847,8 @@ launch(){
 		echo "[DZGUI] All OK. Launching DayZ"
 		$steamsafe_zenity --width 500 --title="DZGUI" --info --text="Launch conditions satisfied.\nDayZ will now launch after clicking [OK]." 2>/dev/null
 		steam -applaunch $aid -connect=$ip -nolauncher -nosplash -skipintro -name=$name \"-mod=$mods\"
+		or
+			flatpak run com.valvesoftware.Steam -applaunch 221100 $aid -connect=$ip -nolauncher -nosplash -skipintro -name=$name \"-mod=$mods\"
 		exit
 	fi
 		one_shot_launch=0
